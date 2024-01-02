@@ -22,14 +22,10 @@ class Utils {
             val mNotificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // Prepare intent which is triggered if the notification is selected
             val intent = Intent(context, HomeActivity::class.java)
             intent.putExtra("notificationID", Utils.NOTIFICATION_ID)
             intent.putExtra("msg", msg)
 
-            // A PendingIntent is a token that you give to another application (e.g. Notification Manager,
-            // Alarm Manager or other 3rd party applications), which allows this other application to use
-            // the permissions of your application to execute a predefined piece of code.
             val pIntent = PendingIntent.getActivity(
                 context,
                 0,
@@ -45,7 +41,6 @@ class Utils {
                     NotificationManager.IMPORTANCE_DEFAULT
                 )
 
-                // Configure the notification channel.
                 notificationChannel.description = "Channel description"
                 notificationChannel.enableLights(true)
                 notificationChannel.lightColor = Color.RED
@@ -58,7 +53,7 @@ class Utils {
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setTicker("TextOnStatus") // .setPriority(Notification.PRIORITY_MAX)
+                .setTicker("TextOnStatus")
                 .setContentTitle("Notification Title")
                 .setLights(Color.RED, 3000, 3000)
                 .setVibrate(longArrayOf(1000, 1000, 0, 0, 0))

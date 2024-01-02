@@ -29,12 +29,23 @@ class HomeActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
 
+        addCategory()
         getDataFromDb()
 
         mainCategoryAdapter.setClickListener(onCLicked)
         subCategoryAdapter.setClickListener(onCLickedSubItem)
 
 
+    }
+    fun addCategory(){
+        launch {
+            this.let {
+                var dao = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao()
+                var rep = dao.insertCategory(CategoryItems(101,"1234","beef","beef des","cat beef thumb"))
+            }
+
+
+        }
     }
 
     private val onCLicked  = object : MainCategoryAdapter.OnItemClickListener{

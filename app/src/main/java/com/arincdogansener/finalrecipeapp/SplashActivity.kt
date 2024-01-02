@@ -2,10 +2,12 @@ package com.arincdogansener.finalrecipeapp
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.arincdogansener.finalrecipeapp.database.RecipeDatabase
 import com.arincdogansener.finalrecipeapp.databinding.ActivitySplashBinding
 import com.arincdogansener.finalrecipeapp.entities.Category
@@ -20,10 +22,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SplashActivity : BaseActivity(), EasyPermissions.RationaleCallbacks, EasyPermissions.PermissionCallbacks{
+class SplashActivity : BaseActivity(){
     private lateinit var binding : ActivitySplashBinding
     private var READ_STORAGE_PERM = 123
     private val STORAGE_PERMISSION_REQUEST_CODE = 1
+    private lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +34,21 @@ class SplashActivity : BaseActivity(), EasyPermissions.RationaleCallbacks, EasyP
         val view = binding.root
         setContentView(view)
 
-        readStorageTask()
+        getCategories()
+        //readStorageTask()
         binding.btnGetStarted.setOnClickListener {
             val intent = Intent(this@SplashActivity, HomeActivity::class.java)
             startActivity(intent)
             println("pressed")
+            if(!this::mediaPlayer.isInitialized){
+                mediaPlayer = MediaPlayer.create(this, R.raw.sound)
+            }
+//            if(mediaPlayer.isPlaying){
+//                mediaPlayer.pause()
+//                mediaPlayer.seekTo(0)
+//                return@setOnClickListener
+//            }
+            mediaPlayer.start()
             finish()
         }
     }
@@ -88,9 +101,9 @@ class SplashActivity : BaseActivity(), EasyPermissions.RationaleCallbacks, EasyP
         launch {
             this.let {
 
-                for (arr in category!!.categoryitems!!){
+                for (item in category!!.categoryitems!!){
                     RecipeDatabase.getDatabase(this@SplashActivity)
-                        .recipeDao().insertCategory(arr)
+                        .recipeDao().insertCategory(item)
                 }
                 //binding.btnGetStarted.visibility = View.VISIBLE
             }
@@ -131,10 +144,11 @@ class SplashActivity : BaseActivity(), EasyPermissions.RationaleCallbacks, EasyP
         }
     }
 
-    private fun hasReadStoragePermission():Boolean{
-        return EasyPermissions.hasPermissions(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
-    }
 
+//    private fun hasReadStoragePermission():Boolean{
+//        return EasyPermissions.hasPermissions(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+//    }
+/*
     private fun readStorageTask() {
         if (hasReadStoragePermission()) {
             clearDataBase()
@@ -194,6 +208,14 @@ override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) 
             // İzin kalıcı olarak reddedildiyse, kullanıcıyı ayarlara yönlendirebilirsiniz
             AppSettingsDialog.Builder(this).build().show()
         }
+    }
+*/
+    override fun onDestroy() {
+        if(this::mediaPlayer.isInitialized){
+            mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+        super.onDestroy()
     }
 }
 //@SuppressLint("CustomSplashScreen")
